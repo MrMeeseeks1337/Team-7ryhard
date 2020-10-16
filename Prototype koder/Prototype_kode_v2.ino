@@ -26,7 +26,7 @@ float hum;  //Stores humidity value
 float temp; //Stores temperature value
 
 int led = D3 ;
-
+int led1 = D4;
 
 
 
@@ -40,6 +40,7 @@ void setup() {
   ThingSpeak.begin(client); //Thingspeak libary starter WiFi client
 
   pinMode(led, OUTPUT); // erklære LED som output
+  pinMode(led1, OUTPUT);
  
 
 
@@ -66,6 +67,7 @@ void loop() {
     }
     Serial.println("Connected to Wi-Fi Succesfully.");
     digitalWrite(led, HIGH); // Turn the LED on
+    digitalWrite(led1, HIGH);
    
   }
 
@@ -93,7 +95,7 @@ void loop() {
   }
 
   if (dht.readHumidity() >= 80) {
-    ThingSpeak.setField(fieldNumberTwo, dht.readHumidity());
+    ThingSpeak.setField(2, dht.readHumidity());
     ThingSpeak.writeFields(counterChannelNumber, myWriteAPIKey);
     
   }

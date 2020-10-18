@@ -22,10 +22,10 @@ DHT dht(DHTPIN, DHTTYPE); //// Initialize DHT sensor
 
 //Variabler
 int chk;
-float hum;  //Stores humidity value
-float temp; //Stores temperature value
+float hum;  //Gemmer fugtighedssensoren værdi
+float temp; //Gemmer temperatur værdi
 
-int led = D3 ;
+int led = D3 ; //diode variabel
 int led1 = D4;
 
 
@@ -34,7 +34,7 @@ int led1 = D4;
 void setup() {
   
   // put your setup code here, to run once:
-  dht.begin();
+  dht.begin(); //starter dht sensor
   Serial.begin(115200);
   WiFi.mode(WIFI_STA); //her startes WiFi Mode for NodeMcu
   ThingSpeak.begin(client); //Thingspeak libary starter WiFi client
@@ -53,33 +53,33 @@ void loop() {
   if (WiFi.status() != WL_CONNECTED)
   {
 
-    digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
-    delay(1000);               // wait for a second
-    digitalWrite(led, LOW);    // turn the LED off by making the voltage LOW
-    delay(1000);               // wait for a second
+    digitalWrite(led, HIGH);   
+    delay(1000);               
+    digitalWrite(led, LOW);    
+    delay(1000);               
     Serial.print("Connecting to ");
     Serial.print(ssid);
     Serial.println(" ....");
-    while (WiFi.status() != WL_CONNECTED)
+    while (WiFi.status() != WL_CONNECTED) //en while løkke der forsøger at tislutte wifi så længe den ikke er tilsluttet 
     {
       WiFi.begin(ssid, pass);
       delay(5000);
     }
     Serial.println("Connected to Wi-Fi Succesfully.");
-    digitalWrite(led, HIGH); // Turn the LED on
+    digitalWrite(led, HIGH); // tænder LED, hvis den er tilsluttet 
     digitalWrite(led1, HIGH);
    
   }
 
 
-  int sensor = analogRead(A0); // Incoming analog signal read and appointed sensor
-  Serial.println(sensor);   //Wrote serial port
+  int sensor = analogRead(A0); // variabl der gemmer vandsensensors værdi fra den analog pin 
+  Serial.println(sensor);   //skriver værdien i serial monitor 
 
   delay(200);
-  //Read data and store it to variables hum and temp
+  //Gemmer værdier fugtighed og temperaruyr i i de to variabler hum og temp
   hum = dht.readHumidity();
   temp = dht.readTemperature();
-  //Print temp and humidity values to serial monitor
+  //Print begge værdier i serial monitor
   Serial.print("Humidity: ");
   Serial.print(hum);
   Serial.print(" %, Temp: ");
@@ -87,16 +87,17 @@ void loop() {
   Serial.println(" Celsius");
   delay(100); //Delay 2 sec.
 
-  if (analogRead(A0) >= 250 ) {
-    ThingSpeak.setField(fieldNumberOne, analogRead(A0));
-    ThingSpeak.writeFields(counterChannelNumber, myWriteAPIKey);
-    delay(20000);
+  if (analogRead(A0) >= 250 ) { /* if statement - der sørger for a der bliver uploadet til thingspeak hvis grænseværiden er lig med eller overstiger 250. 
+  hvis den overstiger er det lig med vand  */
+    ThingSpeak.setField(fieldNumberOne, analogRead(A0)); // her skrives sensor værdi til thingspeaks field 1
+    ThingSpeak.writeFields(counterChannelNumber, myWriteAPIKey); // her uploades der til thingspeak
+    delay(20000); // delay for ikke at spamme bruger
     
   }
 
-  if (dht.readHumidity() >= 80) {
-    ThingSpeak.setField(2, dht.readHumidity());
-    ThingSpeak.writeFields(counterChannelNumber, myWriteAPIKey);
+  if (dht.readHumidity() >= 80) { //  if statement - der sørger for a der bliver uploadet til thingspeak hvis grænseværiden er lig med eller overstiger 80
+    ThingSpeak.setField(2, dht.readHumidity()); //her skrives sensor værdi til thingspeaks field 2 med luftfugtigheden
+    ThingSpeak.writeFields(counterChannelNumber, myWriteAPIKey); // her uploades der til thingspeak 
     
   }
 }
